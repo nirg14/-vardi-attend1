@@ -154,30 +154,39 @@ class AttendanceApp {
 
     // אתחול מאזיני אירועים
     initEventListeners() {
-        // מסך התחברות
-        document.getElementById('teacher-role-btn').addEventListener('click', () => this.selectRole('teacher'));
-        document.getElementById('admin-role-btn').addEventListener('click', () => this.selectRole('admin'));
+        // מאזיני אירועים לכפתורי התחברות
+        document.getElementById('teacher-role-btn').addEventListener('click', () => this.setRole('teacher'));
+        document.getElementById('admin-role-btn').addEventListener('click', () => this.setRole('admin'));
         document.getElementById('login-btn').addEventListener('click', () => this.login());
         
-        // מסך בחירת קורס
-        document.getElementById('stream1-select').addEventListener('change', (e) => this.selectCourse(1, e.target.value));
-        document.getElementById('stream2-select').addEventListener('change', (e) => this.selectCourse(2, e.target.value));
+        // מאזיני אירועים לכפתורי יציאה
+        document.getElementById('teacher-logout').addEventListener('click', () => this.logout());
+        document.getElementById('admin-logout').addEventListener('click', () => this.logout());
+        
+        // מאזיני אירועים לבחירת קורסים
+        document.getElementById('stream1-select').addEventListener('change', (e) => {
+            document.getElementById('stream2-select').value = '';
+            this.loadStudents(e.target.value);
+        });
+        
+        document.getElementById('stream2-select').addEventListener('change', (e) => {
+            document.getElementById('stream1-select').value = '';
+            this.loadStudents(e.target.value);
+        });
+        
+        // מאזיני אירועים לכפתורי פעולה
         document.getElementById('mark-all-present').addEventListener('click', () => this.markAllPresent());
         document.getElementById('reset-attendance').addEventListener('click', () => this.resetAttendance());
         document.getElementById('save-attendance').addEventListener('click', () => this.saveAttendance());
+        
+        // מאזיני אירועים למסך דוח השוואת רצועות
         document.getElementById('comparison-report-btn').addEventListener('click', () => this.showComparisonReport());
-        document.getElementById('teacher-logout').addEventListener('click', () => this.logout());
-        
-        // מסך דוח השוואת רצועות
-        document.getElementById('back-to-attendance').addEventListener('click', () => this.backToAttendance());
+        document.getElementById('back-to-attendance').addEventListener('click', () => this.showCourseSelection());
         document.getElementById('generate-report-btn').addEventListener('click', () => this.generateComparisonReport());
-        document.getElementById('share-report-btn').addEventListener('click', () => this.shareReport());
-        document.getElementById('download-report-btn').addEventListener('click', () => this.downloadReport());
         
-        // מסך ניהול
+        // מאזיני אירועים למסך ניהול מערכת
         document.getElementById('upload-csv-btn').addEventListener('click', () => this.uploadCsv());
         document.getElementById('update-passwords-btn').addEventListener('click', () => this.updatePasswords());
-        document.getElementById('admin-logout').addEventListener('click', () => this.logout());
     }
 
     // בחירת תפקיד בהתחברות
@@ -657,6 +666,29 @@ class AttendanceApp {
         } catch (error) {
             console.error('Error updating passwords:', error);
             alert('שגיאה בעדכון הסיסמאות');
+        }
+    }
+
+    async loadStudents(courseId) {
+        try {
+            if (!courseId) return;
+            
+            this.currentCourse = {
+                id: courseId,
+                stream: document.getElementById('stream1-select').value === courseId ? 1 : 2
+            };
+            
+            // טעינת רשימת התלמידים בקורס
+            this.students = await this.api.getStudentsByCourse(courseId);
+            
+            // איפוס נתוני נוכחות
+            this.attendanceData = {};
+            
+            // הצגת רשימת התלמידים
+            this.renderStudentList();
+        } catch (error) {
+            console.error('Error loading students:', error);
+            alert('שגיאה בטעינת רשימת התלמידים');
         }
     }
 }
