@@ -1,0 +1,250 @@
+// ================================================
+// index.html - דף HTML ראשי של המערכת
+// ================================================
+
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת נוכחות תלמידים</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- מסך כניסה -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-800">מערכת נוכחות תלמידים</h1>
+                <p class="text-gray-600 mt-2">נא להזין סיסמה להתחברות</p>
+            </div>
+            <div class="flex justify-center mb-6">
+                <div class="inline-flex rounded-md shadow-sm" role="group">
+                    <button id="teacher-role-btn" type="button" class="px-4 py-2 text-sm font-medium text-gray-900 bg-blue-100 border border-gray-200 rounded-r-lg hover:bg-blue-200 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700" onclick="selectRole('teacher')">
+                        מורה
+                    </button>
+                    <button id="admin-role-btn" type="button" class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700" onclick="selectRole('admin')">
+                        מנהל
+                    </button>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">סיסמה</label>
+                <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm py-3 px-4 focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50" placeholder="הקלד סיסמה">
+            </div>
+            <button id="login-btn" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                כניסה למערכת
+            </button>
+        </div>
+    </div>
+
+    <!-- מסך בחירת קורס וסימון נוכחות -->
+    <div id="course-selection" class="container mx-auto px-4 py-6" style="display: none;">
+        <div class="sticky-header pt-2 pb-4">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-xl font-bold text-gray-800">מערכת נוכחות</h1>
+                <span class="text-sm text-gray-600" id="user-greeting">שלום, מורה</span>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                <h2 class="text-lg font-medium text-gray-800 mb-3">בחר קורס לסימון נוכחות:</h2>
+                
+                <div class="mb-4">
+                    <label for="stream1-select" class="block text-sm font-medium text-gray-700 mb-2">קורסי רצועה 1:</label>
+                    <select id="stream1-select" class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 bg-white">
+                        <option value="" disabled selected>-- בחר קורס רצועה 1 --</option>
+                        <!-- אפשרויות יטענו דינמית בהמשך -->
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="stream2-select" class="block text-sm font-medium text-gray-700 mb-2">קורסי רצועה 2:</label>
+                    <select id="stream2-select" class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 bg-white">
+                        <option value="" disabled selected>-- בחר קורס רצועה 2 --</option>
+                        <!-- אפשרויות יטענו דינמית בהמשך -->
+                    </select>
+                </div>
+            </div>
+        
+            <div class="bg-white rounded-lg shadow-sm p-4">
+                <h2 class="text-lg font-medium text-gray-800 mb-3">בחר תאריך:</h2>
+                <input type="date" id="attendance-date" class="block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+            </div>
+            
+            <div class="mt-4 flex items-center justify-between">
+                <button id="mark-all-present" class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                    כולם נוכחים
+                </button>
+                <button id="reset-attendance" class="px-4 py-2 text-sm font-medium text-white bg-gray-600 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">
+                    איפוס
+                </button>
+            </div>
+        </div>
+
+        <!-- רשימת תלמידים -->
+        <div id="attendance-list" class="mt-4">
+            <!-- תלמידים יטענו דינמית בהמשך -->
+        </div>
+        
+        <!-- כפתור שמירה -->
+        <div class="mt-6 mb-16 flex justify-center">
+            <button id="save-attendance" class="px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-lg">
+                שמור נוכחות
+            </button>
+        </div>
+        
+        <!-- כפתור דוח השוואת רצועות -->
+        <div class="floating-action-btn" id="comparison-report-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        </div>
+    </div>
+    
+    <!-- מסך דוח השוואת רצועות -->
+    <div id="comparison-report" class="container mx-auto px-4 py-6" style="display: none;">
+        <div class="sticky-header pt-2 pb-4">
+            <div class="flex justify-between items-center mb-4">
+                <button id="back-to-attendance" class="p-2 text-blue-600 focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold text-gray-800">דוח השוואת רצועות</h1>
+            </div>
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                <h2 class="text-lg font-medium text-gray-800 mb-3">תלמידים שנכחו ברצועה 1 ולא נכחו ברצועה 2</h2>
+                <div class="flex items-center mb-4">
+                    <span class="text-sm text-gray-600 ml-2">תאריך:</span>
+                    <input type="date" id="report-date" class="p-2 border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50">
+                </div>
+                <button id="generate-report-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    הפק דוח
+                </button>
+            </div>
+        </div>
+        
+        <!-- תוצאות הדוח -->
+        <div id="report-results" class="bg-white rounded-lg shadow-sm p-4">
+            <!-- תוצאות הדוח יטענו דינמית בהמשך -->
+        </div>
+        
+        <!-- כפתורי פעולה -->
+        <div class="mt-6 grid grid-cols-2 gap-4">
+            <button id="share-report-btn" class="flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                שיתוף
+            </button>
+            <button id="download-report-btn" class="flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                הורדה
+            </button>
+        </div>
+    </div>
+    
+    <!-- מסך ניהול מערכת (אדמין) -->
+    <div id="admin-panel" class="container mx-auto px-4 py-6" style="display: none;">
+        <div class="sticky-header pt-2 pb-4">
+            <div class="flex justify-between items-center mb-4">
+                <h1 class="text-xl font-bold text-gray-800">ניהול מערכת</h1>
+                <button id="admin-logout" class="p-2 text-red-600 focus:outline-none">
+                    יציאה
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+                <h2 class="text-lg font-medium text-gray-800 mb-3">העלאת קובץ CSV חדש</h2>
+                <div class="mb-4">
+                    <label for="csv-file" class="block text-sm font-medium text-gray-700 mb-2">בחר קובץ:</label>
+                    <input type="file" id="csv-file" accept=".csv" class="w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                </div>
+                <button id="upload-csv-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    העלה קובץ
+                </button>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-4">
+            <h2 class="text-lg font-medium text-gray-800 mb-3">עדכון סיסמאות</h2>
+            <div class="mb-4">
+                <label for="teacher-password" class="block text-sm font-medium text-gray-700 mb-2">סיסמת מורים:</label>
+                <input type="password" id="teacher-password" class="w-full p-2 border border-gray-300 rounded-md shadow-sm">
+            </div>
+            <div class="mb-4">
+                <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">סיסמת מנהל:</label>
+                <input type="password" id="admin-password" class="w-full p-2 border border-gray-300 rounded-md shadow-sm">
+            </div>
+            <button id="update-passwords-btn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                עדכן סיסמאות
+            </button>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-sm p-4">
+            <h2 class="text-lg font-medium text-gray-800 mb-3">היסטוריית העלאות</h2>
+            <div id="upload-history" class="divide-y">
+                <!-- היסטוריה תיטען דינמית -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+// ================================================
+// styles.css - קובץ עיצוב CSS למערכת
+// ================================================
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    direction: rtl;
+    background-color: #f5f7fa;
+}
+
+.attendance-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.present {
+    background-color: #4caf50;
+    color: white;
+}
+
+.absent {
+    background-color: #f44336;
+    color: white;
+}
+
+.not-marked {
+    background-color: #e0e0e0;
+    color: #757575;
+}
+
+.attendance-row:nth-child(odd) {
+    background-color: rgba(0,0,0,0.02);
+}
+
+.sticky-header {
+    position: sticky;
+    top: 0;
+    background-color: #f5f7fa;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.floating-action-btn {
+    position: fixed;
+    bottom: 20px;
